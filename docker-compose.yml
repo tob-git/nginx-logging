@@ -11,6 +11,14 @@ services:
     networks:
       - app-network
 
+  app:
+    build: ./app
+    container_name: php-fpm
+    volumes:
+      - ./app:/var/www/html
+    networks:
+      - app-network
+
   clickhouse:
     image: clickhouse/clickhouse-server:24.3
     container_name: clickhouse
