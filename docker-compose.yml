@@ -3,11 +3,13 @@ version: "3.9"
 services:
   nginx:
     image: nginx:1.27-alpine
+    command: ["nginx", "-g", "daemon off;"]
     container_name: nginx
     ports:
       - "8080:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - nginx_logs:/var/log/nginx
     depends_on:
       - app
@@ -29,6 +31,10 @@ services:
     ports:
       - "8123:8123"
       - "9000:9000"
+    environment:
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+      CLICKHOUSE_DEFAULT_USER: admin
+      CLICKHOUSE_DEFAULT_PASSWORD: admin123
     volumes:
       - ./clickhouse/clickhouse-init.sql:/docker-entrypoint-initdb.d/init.sql
       - clickhouse_data:/var/lib/clickhouse
@@ -43,6 +49,7 @@ services:
       - nginx
     volumes:
       - ./fluentbit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ./fluentbit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
       - nginx_logs:/var/log/nginx
     command:
       ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
