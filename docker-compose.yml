@@ -5,7 +5,7 @@ services:
     image: nginx:1.27-alpine
     container_name: nginx
     ports:
-      - "8080:80"
+      - "8090:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - nginx_logs:/var/log/nginx
@@ -26,11 +26,14 @@ services:
   clickhouse:
     image: clickhouse/clickhouse-server:24.3
     container_name: clickhouse
+    environment:
+      - CLICKHOUSE_PASSWORD=
     ports:
       - "8123:8123"
       - "9000:9000"
     volumes:
       - ./clickhouse/clickhouse-init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./clickhouse/users.xml:/etc/clickhouse-server/users.d/users.xml
       - clickhouse_data:/var/lib/clickhouse
     networks:
       - app-network
@@ -43,6 +46,8 @@ services:
       - nginx
     volumes:
       - ./fluentbit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ./fluentbit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
+      - ./logs:/var/log/simulator:ro
       - nginx_logs:/var/log/nginx
     command:
       ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
