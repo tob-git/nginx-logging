@@ -9,5 +9,8 @@ return [
 
     'tables' => [
         'access_logs' => 'nginx_logs',
+        'access_logs_enhanced' => 'nginx_logs',
+        'api_logs' => 'nginx_api_logs',
+        'error_logs' => 'nginx_error_logs',
     ],
 ];
